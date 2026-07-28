@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>ASL Football Club</title>
+<meta name="theme-color" content="#12203A">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ASL FC">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pitch:#1B5E3F;
+    --pitch-dark:#123D29;
+    --turf:#EAF3EC;
+    --navy:#12203A;
+    --gold:#F2B705;
+    --chalk:#FBFBF8;
+    --alert:#C6432B;
+    --line:#D8E3DB;
+    --ink:#12203A;
+    --ink-soft:#5B6B63;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--turf); color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom);
+    overflow-x:hidden;
+  }
+  .display{font-family:'Anton',sans-serif; letter-spacing:0.5px;}
+  #app{display:flex; flex-direction:column; min-height:100vh;}
+
+  /* ---------- Login ---------- */
+  #login{position:fixed; inset:0; background:var(--navy); display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:100; padding:24px;}
+  #login .crest{width:72px; height:72px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; margin-bottom:18px; box-shadow:0 0 0 6px rgba(242,183,5,0.15);}
+  #login .crest svg{width:38px; height:38px;}
+  #login h1{color:var(--chalk); font-size:28px; margin:0 0 4px; text-align:center;}
+  #login p{color:#9FB3A6; margin:0 0 28px; font-size:14px;}
+  #pinInput{
+    font-family:'Anton',sans-serif; font-size:32px; letter-spacing:14px; text-align:center;
+    width:220px; padding:14px 0 14px 14px; border-radius:14px; border:none; background:#1C3350; color:var(--gold);
+    outline:none; margin-bottom:18px;
+  }
+  #loginBtn{
+    background:var(--gold); color:var(--navy); border:none; font-weight:800; font-size:15px;
+    padding:14px 36px; border-radius:100px; cursor:pointer;
+  }
+  #loginErr{color:#FF8A73; font-size:13px; height:18px; margin-top:10px;}
+
+  /* ---------- Header ---------- */
+  header{background:var(--navy); padding:16px 18px 14px; color:var(--chalk); position:sticky; top:0; z-index:10;}
+  .brandRow{display:flex; align-items:center; justify-content:space-between;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand .dot{width:10px; height:10px; border-radius:50%; background:var(--gold);}
+  .brand span{font-family:'Anton'; font-size:19px; letter-spacing:0.5px;}
+  #branchSelect{
+    background:#1C3350; color:var(--chalk); border:none; border-radius:100px; padding:8px 14px;
+    font-size:13px; font-weight:600; font-family:'Inter'; -webkit-appearance:none; appearance:none;
+  }
+
+  /* ---------- Scoreboard ---------- */
+  .scoreboard{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:14px;}
+  .scoreCell{background:#0E1B30; border-radius:10px; padding:10px 6px; text-align:center; border:1px solid #24405F;}
+  .scoreCell b{display:block; font-family:'Anton'; font-size:20px; color:var(--gold); line-height:1;}
+  .scoreCell span{display:block; font-size:9px; text-transform:uppercase; letter-spacing:0.6px; color:#8FA4B8; margin-top:5px;}
+
+  /* ---------- Main content ---------- */
+  main{flex:1; padding:16px; padding-bottom:90px;}
+  .screen{display:none;}
+  .screen.active{display:block;}
+  .sectionTitle{font-family:'Anton'; font-size:18px; margin:0 0 12px; display:flex; align-items:center; justify-content:space-between;}
+  .card{background:#fff; border-radius:14px; padding:14px; margin-bottom:10px; border:1px solid var(--line);}
+  .studentRow{display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--line);}
+  .studentRow:last-child{border-bottom:none;}
+  .studentRow .name{font-weight:700; font-size:14.5px;}
+  .studentRow .meta{color:var(--ink-soft); font-size:12px; margin-top:2px;}
+  .pill{padding:4px 10px; border-radius:100px; font-size:11px; font-weight:700;}
+  .pill.due{background:#FBE7E1; color:var(--alert);}
+  .pill.paid{background:#E1F0E6; color:var(--pitch);}
+  .pill.present{background:#E1F0E6; color:var(--pitch);}
+  .pill.absent{background:#FBE7E1; color:var(--alert);}
+
+  .toggleBtns{display:flex; gap:6px;}
+  .toggleBtns button{border:1.5px solid var(--line); background:#fff; padding:7px 12px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; color:var(--ink-soft);}
+  .toggleBtns button.on-present.active{background:var(--pitch); color:#fff; border-color:var(--pitch);}
+  .toggleBtns button.on-absent.active{background:var(--alert); color:#fff; border-color:var(--alert);}
+
+  .fab{
+    position:fixed; right:18px; bottom:96px; width:52px; height:52px; border-radius:50%;
+    background:var(--gold); color:var(--navy); border:none; font-size:26px; display:flex; align-items:center;
+    justify-content:center; box-shadow:0 6px 16px rgba(0,0,0,0.2); cursor:pointer; z-index:20;
+  }
+
+  input[type=text], input[type=number], input[type=date], select.formInput{
+    width:100%; padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; font-size:14px;
+    font-family:'Inter'; margin-bottom:10px; background:#fff;
+  }
+  label.formLabel{font-size:12px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:4px; display:block;}
+  .primaryBtn{width:100%; background:var(--pitch); color:#fff; border:none; padding:13px; border-radius:10px; font-weight:800; font-size:14px; cursor:pointer;}
+  .ghostBtn{width:100%; background:transparent; color:var(--ink-soft); border:none; padding:10px; font-size:13px; cursor:pointer;}
+
+  .monthPicker, .datePicker{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+  .monthPicker select, .datePicker input{flex:1;}
+
+  /* ---------- Bottom nav ---------- */
+  nav{
+    position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line);
+    display:flex; padding:8px 6px calc(8px + env(safe-area-inset-bottom)); z-index:30;
+  }
+  nav button{
+    flex:1; background:none; border:none; display:flex; flex-direction:column; align-items:center;
+    gap:3px; color:var(--ink-soft); font-size:10.5px; font-weight:700; padding:6px 0; cursor:pointer;
+  }
+  nav button svg{width:21px; height:21px; stroke:var(--ink-soft); fill:none; stroke-width:2;}
+  nav button.active{color:var(--pitch);}
+  nav button.active svg{stroke:var(--pitch);}
+
+  /* ---------- Modal ---------- */
+  .modalOverlay{position:fixed; inset:0; background:rgba(18,32,58,0.55); display:none; align-items:flex-end; z-index:50;}
+  .modalOverlay.open{display:flex;}
+  .modalSheet{background:#fff; width:100%; border-radius:20px 20px 0 0; padding:20px 18px calc(20px + env(safe-area-inset-bottom)); max-height:85vh; overflow-y:auto;}
+  .modalSheet h3{font-family:'Anton'; margin:0 0 14px;}
+  .closeRow{display:flex; justify-content:flex-end; margin-bottom:-6px;}
+  .closeRow button{background:var(--turf); border:none; width:30px; height:30px; border-radius:50%; font-size:16px; color:var(--ink-soft);}
+
+  .empty{text-align:center; color:var(--ink-soft); font-size:13px; padding:30px 10px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="login">
+    <div class="crest">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#12203A" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/></svg>
+    </div>
+    <h1 class="display">ASL FOOTBALL CLUB</h1>
+    <p>Fees &amp; attendance — enter your PIN</p>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="6" placeholder="••••">
+    <button id="loginBtn">Enter</button>
+    <div id="loginErr"></div>
+  </div>
+
+  <header>
+    <div class="brandRow">
+      <div class="brand"><span class="dot"></span><span class="display">ASL FC</span></div>
+      <select id="branchSelect"></select>
+    </div>
+    <div class="scoreboard" id="scoreboard">
+      <div class="scoreCell"><b id="sStudents">—</b><span>Students</span></div>
+      <div class="scoreCell"><b id="sReceived">—</b><span>Collected</span></div>
+      <div class="scoreCell"><b id="sDue">—</b><span>Due</span></div>
+      <div class="scoreCell"><b id="sPresent">—</b><span>Present</span></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="screen active" id="screen-dashboard">
+      <div class="sectionTitle">This month</div>
+      <div class="card" id="dashInfo">
+        <div class="empty">Loading…</div>
+      </div>
+      <div class="sectionTitle">Quick actions</div>
+      <div class="card" style="display:flex; gap:8px;">
+        <button class="primaryBtn" onclick="goTab('attendance')" style="background:var(--navy);">Mark Attendance</button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-students">
+      <div class="sectionTitle">Students <span id="studentCount" style="font-family:'Inter'; font-size:12px; color:var(--ink-soft); font-weight:600;"></span></div>
+      <div class="card" id="studentsList"><div class="empty">Loading…</div></div>
+    </section>
+
+    <section class="screen" id="screen-fees">
+      <div class="sectionTitle">Fees</div>
+      <div class="monthPicker">
+        <select id="monthSelect" class="formInput"></select>
+      </div>
+      <div class="card" id="feesList"><div class="empty">Loading…</div></div>
+    </section>
+
+    <section class="screen" id="screen-attendance">
+      <div class="sectionTitle">Attendance</div>
+      <div class="datePicker">
+        <input type="date" id="attDate">
+        <button class="ghostBtn" style="width:auto; color:var(--pitch); font-weight:700;" onclick="saveAttendance()">Save</button>
+      </div>
+      <div class="card" id="attList"><div class="empty">Loading…</div></div>
+    </section>
+  </main>
+
+  <button class="fab" id="fabAdd" onclick="openAddStudent()">+</button>
+
+  <nav>
+    <button data-tab="dashboard" class="active" onclick="goTab('dashboard')">
+      <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/></svg>Home
+    </button>
+    <button data-tab="students" onclick="goTab('students')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Students
+    </button>
+    <button data-tab="fees" onclick="goTab('fees')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>Fees
+    </button>
+    <button data-tab="attendance" onclick="goTab('attendance')">
+      <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>Attendance
+    </button>
+  </nav>
+</div>
+
+<div class="modalOverlay" id="modalOverlay">
+  <div class="modalSheet">
+    <div class="closeRow"><button onclick="closeModal()">✕</button></div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+}
+</script>
+</body>
+</html>

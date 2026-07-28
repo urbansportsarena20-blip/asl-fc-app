@@ -1,0 +1,15 @@
+{
+  "name": "ASL Football Club",
+  "short_name": "ASL FC",
+  "description": "Fees and attendance manager for ASL Football Club",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#12203A",
+  "theme_color": "#12203A",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
