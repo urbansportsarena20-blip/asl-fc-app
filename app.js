@@ -32,8 +32,8 @@ function todayStr(){
 
 // ====== API HELPERS ======
 async function apiGet(action, params={}){
-  const q = new URLSearchParams({ action, pin: STATE.pin, ...params }).toString();
-  const res = await fetch(`${CONFIG.API_URL}?${q}`);
+  const q = new URLSearchParams({ action, pin: STATE.pin, _ts: Date.now(), ...params }).toString();
+  const res = await fetch(`${CONFIG.API_URL}?${q}`, { cache: 'no-store' });
   const json = await res.json();
   if (!json.ok) throw new Error(json.error || 'Request failed');
   return json.data;
@@ -41,6 +41,7 @@ async function apiGet(action, params={}){
 async function apiPost(action, payload={}){
   const res = await fetch(CONFIG.API_URL, {
     method: 'POST',
+    cache: 'no-store',
     body: JSON.stringify({ action, pin: STATE.pin, ...payload })
   });
   const json = await res.json();
