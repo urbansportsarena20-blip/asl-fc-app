@@ -1,7 +1,7 @@
 // ====== CONFIG ======
 // Paste your deployed Apps Script Web App URL below (ends in /exec)
 const CONFIG = {
-  API_URL: 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'
+  API_URL: 'API_URL: 'https://script.google.com/macros/s/AKfycbwh33GYlc2qeRKuJ96KlhqdQ6u3s2jPWX84sb1I5Unjmsa5YeyDK8pFO5S6EtbL4qZvFA/exec''
 };
 
 const BRANCHES = ['Urban Sports Arena', 'Rishikul Vijay', 'Gyanvihar'];
