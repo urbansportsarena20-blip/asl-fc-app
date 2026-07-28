@@ -1,7 +1,7 @@
 // ====== CONFIG ======
 // Paste your deployed Apps Script Web App URL below (ends in /exec)
 const CONFIG = {
-  API_URL: 'API_URL: 'https://script.google.com/macros/s/AKfycbwh33GYlc2qeRKuJ96KlhqdQ6u3s2jPWX84sb1I5Unjmsa5YeyDK8pFO5S6EtbL4qZvFA/exec''
+  API_URL: 'API_URL: 'https://script.google.com/macros/s/AKfycbw5H8V18If04bbuJUpFRBchuHouZ_Y9VHM0BSzk3VCv5aagPXD1suP45e2hiFpGGWNcRQ/exec'
 };
 
 const BRANCHES = ['Urban Sports Arena', 'Rishikul Vijay', 'Gyanvihar'];
