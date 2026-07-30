@@ -208,6 +208,9 @@ function openEditStudent(studentId){
     </select>
     <label class="formLabel">Fee amount (₹) for that period</label>
     <input type="number" id="editFee" value="${s.FeeAmount || ''}">
+    <label class="formLabel">Join / cycle start date</label>
+    <input type="date" id="editJoin" value="${s.JoinDate || todayStr()}">
+    <div class="meta" style="margin:-4px 0 10px;">This date anchors their billing cycle — change it if a payment cycle looks off.</div>
     <label class="formLabel">Status</label>
     <select id="editStatus" class="formInput">
       <option ${s.Status!=='Inactive'?'selected':''}>Active</option>
@@ -225,6 +228,7 @@ async function submitEditStudent(studentId){
       contact: document.getElementById('editContact').value.trim(),
       feeType: document.getElementById('editFeeType').value,
       feeAmount: document.getElementById('editFee').value,
+      joinDate: document.getElementById('editJoin').value,
       status: document.getElementById('editStatus').value
     }
   });
