@@ -11,8 +11,21 @@ let STATE = {
   feesStatus: [],     // active students only, with computed cycle info
   attendance: [],
   date: todayStr(),
-  attDraft: {}
+  attDraft: {},
+  feesView: 'current',       // 'current' or 'history'
+  historyMonth: currentYearMonth(),
+  historyData: null
 };
+
+function currentYearMonth(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+}
+function yearMonthLabel(ym){
+  const [y,m] = ym.split('-').map(Number);
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return months[m-1] + ' ' + y;
+}
 
 function todayStr(){
   const d = new Date();
@@ -86,11 +99,31 @@ function boot(){
   dateInput.value = STATE.date;
   dateInput.addEventListener('change', () => { STATE.date = dateInput.value; STATE.attDraft = {}; loadAttendance(); });
 
+  const histSel = document.getElementById('historyMonthSelect');
+  const opts = [];
+  const d = new Date();
+  for (let i = 0; i < 12; i++) {
+    const ym = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    opts.push(ym);
+    d.setMonth(d.getMonth() - 1);
+  }
+  histSel.innerHTML = opts.map(ym => `<option value="${ym}" ${ym===STATE.historyMonth?'selected':''}>${yearMonthLabel(ym)}</option>`).join('');
+  histSel.addEventListener('change', () => { STATE.historyMonth = histSel.value; loadFeesHistory(); });
+
   refreshAll();
+}
+
+function setFeesView(view){
+  STATE.feesView = view;
+  document.getElementById('segCurrent').classList.toggle('active', view==='current');
+  document.getElementById('segHistory').classList.toggle('active', view==='history');
+  document.getElementById('historyMonthWrap').style.display = view==='history' ? 'block' : 'none';
+  if (view === 'history') loadFeesHistory(); else renderFees();
 }
 
 async function refreshAll(){
   await Promise.all([loadStudents(), loadFees(), loadAttendance(), loadSummary()]);
+  if (STATE.feesView === 'history') loadFeesHistory();
 }
 
 // ====== TABS ======
@@ -238,11 +271,37 @@ async function submitEditStudent(studentId){
   loadSummary();
 }
 
+async function loadFeesHistory(){
+  const el = document.getElementById('feesList');
+  el.innerHTML = '<div class="empty">Loading…</div>';
+  try {
+    STATE.historyData = await apiGet('feesHistory', { branch: STATE.branch, yearMonth: STATE.historyMonth });
+    renderFeesHistory();
+  } catch (err) { console.error(err); }
+}
+function renderFeesHistory(){
+  const el = document.getElementById('feesList');
+  const h = STATE.historyData;
+  if (!h || !h.rows.length) { el.innerHTML = `<div class="empty">No payments recorded for ${yearMonthLabel(STATE.historyMonth)}.</div>`; return; }
+  el.innerHTML = `
+    <div class="historyTotal">
+      <span class="meta">${h.count} payment${h.count===1?'':'s'} in ${yearMonthLabel(STATE.historyMonth)}</span>
+      <b>₹${h.total}</b>
+    </div>
+    ${h.rows.map(r => `
+      <div class="studentRow">
+        <div><div class="name">${r.name}</div><div class="meta">${r.date} · ${r.mode || 'No mode'}${r.notes ? ' · 📝 ' + r.notes : ''}</div></div>
+        <b class="display">₹${r.amount}</b>
+      </div>
+    `).join('')}
+  `;
+}
+
 // ====== FEES (billing-cycle based) ======
 async function loadFees(){
   try {
     STATE.feesStatus = await apiGet('feesStatus', { branch: STATE.branch });
-    renderFees();
+    if (STATE.feesView === 'current') renderFees();
   } catch (err) { console.error(err); }
 }
 function renderFees(){
