@@ -291,10 +291,20 @@ function renderFeesHistory(){
     ${h.rows.map(r => `
       <div class="studentRow">
         <div><div class="name">${r.name}</div><div class="meta">${r.date} · ${r.mode || 'No mode'}${r.notes ? ' · 📝 ' + r.notes : ''}</div></div>
-        <b class="display">₹${r.amount}</b>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <b class="display">₹${r.amount}</b>
+          <button class="ghostBtn" style="width:auto; color:var(--alert); font-weight:700; padding:4px;" onclick="deleteHistoryEntry('${r.feeId}')">Delete</button>
+        </div>
       </div>
     `).join('')}
   `;
+}
+async function deleteHistoryEntry(feeId){
+  if (!confirm('Delete this payment entry? This cannot be undone.')) return;
+  await apiPost('deleteFee', { feeId });
+  loadFeesHistory();
+  loadFees();
+  loadSummary();
 }
 
 // ====== FEES (billing-cycle based) ======
