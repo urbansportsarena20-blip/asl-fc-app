@@ -252,7 +252,7 @@ function renderFees(){
     <div class="studentRow">
       <div>
         <div class="name">${f.name}</div>
-        <div class="meta">${f.feeType} · ₹${f.received} of ₹${f.feeAmount} · ${prettyDate(f.cycleStart)} – ${prettyDate(f.cycleEnd)}</div>
+        <div class="meta">${f.feeType} · ₹${f.received} of ₹${f.feeAmount} · ${prettyDate(f.cycleStart)} – ${prettyDate(f.cycleEnd)}${f.notes ? ' · 📝 ' + f.notes : ''}</div>
       </div>
       <div style="display:flex; align-items:center; gap:8px;">
         <span class="pill ${f.paid ? 'paid' : 'due'}">${f.paid ? 'Collected' : 'Due'}</span>
@@ -274,8 +274,10 @@ function openRecordFee(studentId){
     <input type="date" id="feeDate" value="${todayStr()}">
     <label class="formLabel">Mode</label>
     <select id="feeMode" class="formInput">
-      ${['UPI','Cash','Bank Transfer','Other'].map(m => `<option>${m}</option>`).join('')}
+      ${['UPI','Cash','Bank Transfer','Other'].map(m => `<option ${f.mode===m?'selected':''}>${m}</option>`).join('')}
     </select>
+    <label class="formLabel">Notes</label>
+    <textarea id="feeNotes" class="formInput" rows="3" placeholder="e.g. partial payment, will pay rest by 10th">${f.notes || ''}</textarea>
     <button class="primaryBtn" onclick="submitFee('${studentId}')">Save</button>
   `;
   openModal();
@@ -289,7 +291,8 @@ async function submitFee(studentId){
       amountDue: document.getElementById('feeDue').value,
       amountReceived: document.getElementById('feeReceived').value,
       dateReceived: document.getElementById('feeDate').value,
-      mode: document.getElementById('feeMode').value
+      mode: document.getElementById('feeMode').value,
+      notes: document.getElementById('feeNotes').value.trim()
     }
   });
   closeModal();
