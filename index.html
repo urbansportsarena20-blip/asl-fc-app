@@ -108,6 +108,12 @@
   .monthPicker, .datePicker{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
   .monthPicker select, .datePicker input{flex:1;}
 
+  .segmentToggle{display:flex; background:#E4EDE6; border-radius:10px; padding:3px; margin-bottom:12px;}
+  .segBtn{flex:1; background:none; border:none; padding:9px; border-radius:8px; font-size:13px; font-weight:700; color:var(--ink-soft); cursor:pointer;}
+  .segBtn.active{background:#fff; color:var(--pitch); box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+  .historyTotal{display:flex; justify-content:space-between; align-items:center; padding:4px 0 14px;}
+  .historyTotal b{font-family:'Anton'; font-size:22px; color:var(--pitch);}
+
   /* ---------- Bottom nav ---------- */
   nav{
     position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line);
@@ -178,6 +184,13 @@
 
     <section class="screen" id="screen-fees">
       <div class="sectionTitle">Fees</div>
+      <div class="segmentToggle">
+        <button id="segCurrent" class="segBtn active" onclick="setFeesView('current')">Current</button>
+        <button id="segHistory" class="segBtn" onclick="setFeesView('history')">History</button>
+      </div>
+      <div id="historyMonthWrap" style="display:none;">
+        <select id="historyMonthSelect" class="formInput"></select>
+      </div>
       <div class="card" id="feesList"><div class="empty">Loading…</div></div>
     </section>
 
